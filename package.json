@@ -1,0 +1,20 @@
+{
+  "dependencies": {
+    "env-cmd": "^10.1.0",
+    "express": "^4.21.1",
+    "mongodb": "^6.11.0",
+    "mongoose": "^8.8.2",
+    "nodemon": "^3.1.7"
+  },
+  "name": "wanderly-backend",
+  "version": "1.0.0",
+  "description": "Backend for Our Wanderly Personal Project",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "env-cmd -f dev.env nodemon src/app.js"
+  },
+  "author": "",
+  "license": "ISC"
+}
