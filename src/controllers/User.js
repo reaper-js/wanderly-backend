@@ -13,6 +13,7 @@ export const signup = async (req, res) => {
         const token = await user.generateAuthToken();
         res.status(201).json({ message: 'User created successfully',  token});
     } catch (error) {
+        // console.log(error);        
         res.status(500).json({ message: 'Error creating user', error });
     }
 };
@@ -40,12 +41,25 @@ export const login = async (req, res) => {
 };
 
 export const logoutAll = async (req, res) => {
-    const _id = req.user.id
-    const user = await User.findById(_id);
-    user.tokens = [];
-    await user.save();
-    res.send("Logged out from all devs")
+    try {
+        const user = req.user;
+        user.tokens = [];
+        await user.save();
+        res.send("Logged out from all devs")
+    } catch (error) {
+        res.status(500).json({ message: 'Error logging out', error });
+    }
 }
 
+export const logoutOne = async (req, res) => {
+    try {
+        const user = req.user;
+        user.tokens = user.tokens.filter((token) => token.token !== req.token);
+        await user.save();
+        res.send("Logged out this device");
+    } catch (error) {
+        res.status(500).json({ message: 'Error logging out', error });
+    }
+}
 
 //start ---------> middleware ---------> endpoint
