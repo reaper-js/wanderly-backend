@@ -19,7 +19,7 @@
   "type": "module",
   "scripts": {
     "start": "node src/app.js",
-    "dev": "env-cmd -f dev.env nodemon src/app.js"
+    "dev": "env-cmd -f dev.env nodemon --host src/app.js"
   },
   "author": "",
   "license": "ISC"
