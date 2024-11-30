@@ -29,20 +29,31 @@ const getKgmid = async (query) => {
 // };
 
 export const searchFlights = async (req, res) => {
-    const { arrivalQuery } = req.body;
+  try {
+    const { arrivalQuery, departureQuery, date } = req.body;
     const cityName = arrivalQuery.split(',')[0].trim();
+    const departureCityName = departureQuery.split(',')[0].trim();
     const arrivalId = await getKgmid(cityName);
-    
-  getJson({
-    engine: "google_flights",
-    hl: "en",
-    departure_id: "/m/0dlv0", // New Delhi
-    arrival_id: arrivalId,
-    outbound_date: "2024-12-07",
-    currency: "INR",
-    type: "2",
-    api_key: process.env.SERPAPI_KEY
-  }, (json) => {
-    res.json(json.best_flights[0].price);
-  });
+    const departureId = await getKgmid(departureCityName);
+    const nowdate = date? date :  new Date().toISOString().split('T')[0];
+    console.log(date);
+    getJson({
+      engine: "google_flights",
+      hl: "en",
+      departure_id: departureId,
+      arrival_id: arrivalId,
+      outbound_date: nowdate,
+      currency: "INR",
+      type: "2",
+      api_key: process.env.SERPAPI_KEY
+    }, (json) => {
+      if (!json.best_flights || json.best_flights.length === 0) {
+        return res.status(404).json(null);
+      }
+      res.json(json.best_flights[0].price);
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: 'Failed to fetch flights' });
+  }
 }

@@ -74,50 +74,39 @@ export const getPhoto = async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch photo' });
   }
 }
-// export const getPlaceDetails = async (req, res) => {
-//   const { placeid } = req.query;
-//   try {
-//     const response = await axios.get(
-//       `https://maps.googleapis.com/maps/api/place/details/json?placeid=${placeid}&fields=name,formatted_address,photos,editorial_summary&key=${process.env.GOOGLE_MAPS_API_KEY}`
-//     );
-//     const placeDetails = response.data.result;
-//     const photos = placeDetails.photos.slice(0, 5).map((photo) => ({
-//       photo : photo.photo_reference,
-//     }));
-//     const returns = {
-//       name: placeDetails.name,
-//       description: placeDetails.editorial_summary?.overview ||
-//                   `${placeDetails.name} is a popular destination known for its unique character and attractions.`,
-//       address: placeDetails.formatted_address,
-//       photos: photos.map((photo) => ({
-//         url: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photoreference=${photo}&key=${process.env.GOOGLE_MAPS_API_KEY}`
-//       }))
-//     }
-//     res.status(200).json(returns);
-//     // res.status(200).json(response.data);
-//   } catch (error) {
-//     console.log(error);
-//     res.status(500).json({ error: 'Failed to fetch place details' });
-//   }
-// }
 
 
-// export const getPlacePhotos = async (req, res) => {
-//   const { placeid } = req.query;
-//   try {
-//     const detailsResponse = await axios.get(
-//       `https://maps.googleapis.com/maps/api/place/details/json?placeid=${placeid}&fields=photos&key=${process.env.GOOGLE_MAPS_API_KEY}`
-//     );
-//     console.log(detailsResponse);
-    
-//     const photoReferences = detailsResponse.data.result.photos || [];
-//     const photos = photoReferences.slice(0, 5).map((photo) => ({
-//       url: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photoreference=${photo.photo_reference}&key=${process.env.GOOGLE_MAPS_API_KEY}`,
-//       description: "View of the location"
-//     }));
-    
-//     res.json({ photos });
-//   } catch (error) {
-//     res.status(500).json({ error: 'Failed to fetch place photos' });
-//   }
-// }
+export const attractions = async (req, res) => {
+  const { city } = req.query;
+  if (!city) {
+      return res.status(400).json({ error: 'City is required' });
+  }
+
+  try {
+      // Example: Using Google Places API
+      const googleApiKey = process.env.GOOGLE_MAPS_API_KEY;
+      const response = await axios.get(
+          `https://maps.googleapis.com/maps/api/place/textsearch/json`,
+          {
+              params: {
+                  query: `top attractions in ${city}`,
+                  type: 'tourist_attraction', // Filter for attractions
+                  key: googleApiKey,
+                  pagesize: 10,
+              },
+          }
+      );
+
+      const results = response.data.results.slice(0, 10).map((place, index) => ({
+          id: index,
+          name: place.name,
+          photoUrl: `/photos/${place.photos?.[0]?.photo_reference}`, // For fetching photos
+      }));
+
+      res.status(200).json(results);
+  } catch (error) {
+      console.error(error.message);
+      res.status(500).json({ error: 'Failed to fetch tourist attractions' });
+  }
+};
+
