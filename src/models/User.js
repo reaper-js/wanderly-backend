@@ -38,7 +38,11 @@ const userSchema = new mongoose.Schema({
     onTrip: {
         type: Boolean,
         default: false
-    }
+    },
+    trips: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Trip'
+    }]  
     ,
     tokens: [{
         token: {

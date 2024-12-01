@@ -1,4 +1,5 @@
 import User from '../models/User.js';
+import Trip from '../models/Trips.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
@@ -70,3 +71,52 @@ export const logoutOne = async (req, res) => {
 }
 
 //start ---------> middleware ---------> endpoint
+
+
+//OffTrip Post requests
+export const saveTrip = async (req, res) => {
+    try {
+    const { tripLocation, tripBudget, tripStartDate, tripAttractions } = req.body;
+    const userId = req.user._id;
+    const newTrip = new Trip({
+        userId,
+        tripLocation,
+        tripStartDate,
+        tripBudget,
+        tripAttractions
+
+    });
+        await newTrip.save();
+        const user = req.user;
+        user.trips.push(newTrip._id);
+        await user.save();
+        res.status(201).json(newTrip);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: 'Error creating trip', error });
+    }
+}
+
+export const startTrip = async (req, res) => {
+    try {
+    const { tripLocation, tripBudget, tripAttractions } = req.body;
+    const userId = req.user._id;
+    const newTrip = new Trip({
+        userId,
+        tripLocation,
+        tripStartDate: new Date(),
+        tripBudget,
+        tripAttractions,
+        tripStarted: true
+    });
+        await newTrip.save();
+        const user = req.user;
+        user.trips.push(newTrip._id);
+        await user.save();
+        res.status(201).json(newTrip);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: 'Error creating trip', error });
+    }
+}
+
