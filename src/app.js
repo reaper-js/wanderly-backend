@@ -12,12 +12,17 @@ const app = express();
 connectDB();
 
 app.use(cors({
-  origin: process.env.FRONTEND_URL,
+  origin: [process.env.FRONTEND_URL, 'http://localhost:5173'],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], 
-  credentials: true 
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+  preflightContinue: true,
+  optionsSuccessStatus: 200
 }));
 
+app.options('*', cors());
 app.use(express.json());
+
 
 app.use(userRouter);
 app.use(generalRouter);
