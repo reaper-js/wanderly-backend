@@ -120,3 +120,23 @@ export const startTrip = async (req, res) => {
     }
 }
 
+//-------------getTrips Controller------------//
+export const getTrips = async (req, res) =>{
+    try{
+        const userId = req.user._id;
+        const trips = await Trip.find({ userId });
+        // res.status(200).json(trips);
+        // console.log(trips);
+        const completed = trips.filter((trip)=>{
+            return trip.tripComplete === true && trip.tripStarted === false
+        })
+        const saved = trips.filter((trip)=>{
+            return trip.tripStarted === false && trip.tripComplete === false
+        })
+        const response ={completed, saved};
+        res.status(200).json(response);
+
+    }catch(e){
+        res.status(500).json({ message: 'Error fetching trips', error: e });
+    }
+}
