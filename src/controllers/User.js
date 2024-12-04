@@ -70,6 +70,34 @@ export const logoutOne = async (req, res) => {
     }
 }
 
+
+export const updateProfile = async (req, res) => {
+    const { name, email, oldPassword, newPassword } = req.body;
+    try {
+        const user = req.user;
+        if(name !== ''){
+            user.name = name;
+        }
+        if (email !== ''){
+            user.email = email;
+        }
+        if(newPassword === '' || oldPassword === ''){
+            return res.status(400).json({ message: 'New password and old password are required' });
+        }
+        if (oldPassword && newPassword) {
+            const isMatch = await bcrypt.compare(oldPassword, user.password);
+            if (!isMatch) {
+                return res.status(401).json({ message: 'Invalid old password' });
+            }
+            user.password = await bcrypt.hash(newPassword, 10);
+        }
+        await user.save();
+        res.status(200).json({ message: 'Profile updated successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error updating profile', error });
+    }
+}
+
 //start ---------> middleware ---------> endpoint
 
 
