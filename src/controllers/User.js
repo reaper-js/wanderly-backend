@@ -132,19 +132,62 @@ export const startTrip = async (req, res) => {
     const newTrip = new Trip({
         userId,
         tripLocation,
-        tripStartDate: new Date(),
+        tripStartDate: new Date().toISOString().split("T")[0],
         tripBudget,
         tripAttractions,
         tripStarted: true
     });
         await newTrip.save();
         const user = req.user;
+        user.onTrip = true;
         user.trips.push(newTrip._id);
         await user.save();
         res.status(201).json(newTrip);
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: 'Error creating trip', error });
+    }
+}
+
+export const startExistingTrip = async (req, res) => {
+    try {
+    const { tripId } = req.params;
+    const userId = req.user._id;
+    const user = req.user;
+    const trip = await Trip.findById(tripId);
+    if (!trip) {
+        return res.status(404).json({ message: 'Trip not found' });
+    }
+    console.log(userId);
+    console.log(trip.userId);
+    if (trip.userId.toString() !== userId.toString()) {
+        return res.status(403).json({ message: 'Unauthorized' });
+    }
+    trip.tripStarted = true;
+    user.onTrip = true;
+    await trip.save();
+    res.status(200).json(trip);
+    } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: 'Error starting trip', error });
+    }
+}
+
+export const getTrip = async (req, res) => {
+    try {
+    const { tripId } = req.params;
+    const userId = req.user._id;
+    const trip = await Trip.findById(tripId);
+    if (!trip) {
+        return res.status(404).json({ message: 'Trip not found' });
+    }
+    if (trip.userId.toString() !== userId.toString()) {
+        return res.status(403).json({ message: 'Unauthorized' });
+    }
+    res.status(200).json(trip);
+    } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: 'Error fetching trip', error });
     }
 }
 
@@ -166,5 +209,29 @@ export const getTrips = async (req, res) =>{
 
     }catch(e){
         res.status(500).json({ message: 'Error fetching trips', error: e });
+    }
+}
+
+export const editTrip = async (req, res) => {
+    try {
+    const { tripId } = req.params;
+    const { tripComplete, tripCompletedDate, tripBudget, tripAttractions } = req.body;
+    const userId = req.user._id;
+    const trip = await Trip.findById(tripId);
+    if (!trip) {
+        return res.status(404).json({ message: 'Trip not found' });
+    }
+    if (trip.userId.toString() !== userId.toString()) {
+        return res.status(403).json({ message: 'Unauthorized' });
+    }
+    trip.tripComplete = tripComplete || trip.tripComplete;
+    trip.tripCompletedDate = tripCompletedDate || trip.tripCompletedDate;
+    trip.tripBudget = tripBudget || trip.tripBudget;
+    trip.tripAttractions = tripAttractions || trip.tripAttractions;
+    await trip.save();
+    res.status(200).json(trip);
+    } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: 'Error editing trip', error });
     }
 }

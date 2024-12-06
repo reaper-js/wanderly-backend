@@ -26,6 +26,9 @@ const tripSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    tripCompletedDate: {
+        type: Date,
+    },
     tripBudget: {
         type: Number,
         required: true
