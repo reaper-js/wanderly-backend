@@ -47,7 +47,23 @@ const tripSchema = new mongoose.Schema({
             }
         }],
         default: []
-    }},
+    },
+    completedActivities: {
+        type: [{
+            name: {
+                type: String,
+                trim: true,
+                required: true
+            },
+            photoUrl: {
+                type: String,
+                trim: true,
+                required: true
+            }
+        }],
+        default: []
+    }
+},
     {
         timestamps: true
     }

@@ -111,8 +111,8 @@ export const saveTrip = async (req, res) => {
         tripLocation,
         tripStartDate,
         tripBudget,
-        tripAttractions
-
+        tripAttractions,
+        completedActivities: [],
     });
         await newTrip.save();
         const user = req.user;
@@ -135,7 +135,8 @@ export const startTrip = async (req, res) => {
         tripStartDate: new Date().toISOString().split("T")[0],
         tripBudget,
         tripAttractions,
-        tripStarted: true
+        tripStarted: true,
+        completedActivities: [],
     });
         await newTrip.save();
         const user = req.user;
@@ -215,7 +216,7 @@ export const getTrips = async (req, res) =>{
 export const editTrip = async (req, res) => {
     try {
     const { tripId } = req.params;
-    const { tripComplete, tripCompletedDate, tripBudget, tripAttractions } = req.body;
+    const { tripComplete, tripCompletedDate, tripBudget, tripAttractions, completedActivities } = req.body;
     const userId = req.user._id;
     const trip = await Trip.findById(tripId);
     if (!trip) {
@@ -228,6 +229,7 @@ export const editTrip = async (req, res) => {
     trip.tripCompletedDate = tripCompletedDate || trip.tripCompletedDate;
     trip.tripBudget = tripBudget || trip.tripBudget;
     trip.tripAttractions = tripAttractions || trip.tripAttractions;
+    trip.completedActivities = completedActivities || trip.completedActivities;
     await trip.save();
     res.status(200).json(trip);
     } catch (error) {
