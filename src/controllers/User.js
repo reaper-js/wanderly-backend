@@ -48,6 +48,18 @@ export const login = async (req, res) => {
     }
 };
 
+//get user status of onTrip
+export const getUserStatus = async (req, res) => {
+    try {
+        const user = req.user;
+        res.status(200).json({ onTrip: user.onTrip,
+            tripId: user.trips[user.trips.length - 1]
+         });
+    } catch (error) {
+        res.status(500).json({ message: 'Error getting user status', error });
+    }
+}
+
 export const logoutAll = async (req, res) => {
     try {
         const user = req.user;
@@ -104,12 +116,13 @@ export const updateProfile = async (req, res) => {
 //OffTrip Post requests
 export const saveTrip = async (req, res) => {
     try {
-    const { tripLocation, tripBudget, tripStartDate, tripAttractions } = req.body;
+    const { tripLocation, estimatedBudget, tripBudget, tripStartDate, tripAttractions } = req.body;
     const userId = req.user._id;
     const newTrip = new Trip({
         userId,
         tripLocation,
         tripStartDate,
+        estimatedBudget,
         tripBudget,
         tripAttractions,
         completedActivities: [],
@@ -134,6 +147,7 @@ export const startTrip = async (req, res) => {
         tripLocation,
         tripStartDate: new Date().toISOString().split("T")[0],
         tripBudget,
+        estimatedBudget: 0,
         tripAttractions,
         tripStarted: true,
         completedActivities: [],
@@ -235,5 +249,32 @@ export const editTrip = async (req, res) => {
     } catch (error) {
     console.log(error);
     res.status(500).json({ message: 'Error editing trip', error });
+    }
+}
+
+
+//end Trip
+export const endTrip = async (req, res) => {
+    try {
+    const { tripId } = req.params;
+    const userId = req.user._id;
+    const trip = await Trip.findById(tripId);
+    if (!trip) {
+        return res.status(404).json({ message: 'Trip not found' });
+    }
+    if (trip.userId.toString() !== userId.toString()) {
+        return res.status(403).json({ message: 'Unauthorized' });
+    }
+    trip.tripComplete = true;
+    trip.tripCompletedDate = new Date().toISOString().split("T")[0];
+    trip.tripStarted = false;
+    await trip.save();
+    const user = req.user;
+    user.onTrip = false;
+    await user.save();
+    res.status(200).json(trip);
+    } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: 'Error ending trip', error });
     }
 }

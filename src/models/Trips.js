@@ -30,6 +30,21 @@ const tripSchema = new mongoose.Schema({
         type: Date,
     },
     tripBudget: {
+        type: [
+            {
+                name: {
+                    type: String,
+                    trim: true,
+                    required: true
+                },
+                cost: {
+                    type: Number,
+                    required: true
+                }
+            }
+        ]
+    },
+    estimatedBudget: {
         type: Number,
         required: true
     },
