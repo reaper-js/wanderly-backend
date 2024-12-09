@@ -101,6 +101,7 @@ export const attractions = async (req, res) => {
           id: index,
           name: place.name,
           photoUrl: `/photos/${place.photos?.[0]?.photo_reference}`, // For fetching photos
+          formatted_address: place.formatted_address,
       }));
 
       res.status(200).json(results);

@@ -59,6 +59,11 @@ const tripSchema = new mongoose.Schema({
                 type: String,
                 trim: true,
                 required: true
+            },
+            formatted_address: {
+                type: String,
+                trim: true,
+                required: true
             }
         }],
         default: []
@@ -71,6 +76,11 @@ const tripSchema = new mongoose.Schema({
                 required: true
             },
             photoUrl: {
+                type: String,
+                trim: true,
+                required: true
+            },
+            formatted_address: {
                 type: String,
                 trim: true,
                 required: true
