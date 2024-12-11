@@ -181,6 +181,7 @@ export const startExistingTrip = async (req, res) => {
     trip.tripStarted = true;
     user.onTrip = true;
     await trip.save();
+    await user.save();
     res.status(200).json(trip);
     } catch (error) {
     console.log(error);

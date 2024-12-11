@@ -2,6 +2,7 @@ import { Client } from '@googlemaps/google-maps-services-js';
 import axios from 'axios';
 
 
+
 //Search destinations Auto-Complete
 const client = new Client({});
 export const autocompleteSearch = async (req, res) => {
@@ -111,3 +112,52 @@ export const attractions = async (req, res) => {
   }
 };
 
+export const fetchWeather = async (req, res) => {
+  const cityName = req.params.city;
+  const apikey = process.env.OPENWEATHER_API_KEY;
+  try{
+    const url = `http://api.weatherapi.com/v1/current.json?key=${apikey}&q=${cityName}&aqi=no`;
+    const response = await axios.get(url);
+    res.status(200).json(response.data);
+  }catch(e){
+    console.log(e);
+  }
+  
+}
+
+export const getRoute = async (req, res) => {
+  const requestBody = req.body;
+  console.log(requestBody);
+  try {
+    const response = await axios.post(
+      `https://routes.googleapis.com/directions/v2:computeRoutes`,
+      requestBody,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Goog-Api-Key': process.env.GOOGLE_MAPS_API_KEY,
+          'X-Goog-FieldMask': 'routes.distanceMeters,routes.duration,routes.polyline.encodedPolyline',
+        },
+      }
+    );
+    res.json(response.data);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch route data.' });
+  }
+};
+
+export const getMapData = async (req, res) => {
+  try {
+    res.set({
+      'Content-Type': 'application/javascript',
+      'Access-Control-Allow-Origin': '*'
+    });
+    
+    const mapUrl = `https://maps.googleapis.com/maps/api/js?key=${process.env.GOOGLE_MAPS_API_KEY}&libraries=geometry`;
+    const response = await axios.get(mapUrl);
+    res.send(response.data);
+  } catch (error) {
+    console.error('Error fetching Google Maps script:', error);
+    res.status(500).send('Failed to load Google Maps API script');
+  }
+};
