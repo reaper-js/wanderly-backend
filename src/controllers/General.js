@@ -114,6 +114,7 @@ export const attractions = async (req, res) => {
 export const fetchWeather = async (req, res) => {
   const cityName = req.params.city;
   const apikey = process.env.WEATHER_API_KEY;
+  console.log(apikey);
   try {
     const url = `http://api.weatherapi.com/v1/current.json?key=${apikey}&q=${cityName}&aqi=no`;
     const response = await axios.get(url);
@@ -171,7 +172,7 @@ export const getMapData = async (req, res) => {
 
     // Construct the static map URL
     const params = {
-      size: "800x600",
+      size: "1000x350",
       path: `enc:${polyline}`,
       key: process.env.GOOGLE_MAPS_API_KEY,
     };
