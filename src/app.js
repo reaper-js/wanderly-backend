@@ -29,8 +29,8 @@ app.use(generalRouter);
 app.use(flightRouter);
 
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+// app.listen(PORT, () => {
+//     console.log(`Server is running on port ${PORT}`);
+// });
 
-// export default app; 
+export default app; 
