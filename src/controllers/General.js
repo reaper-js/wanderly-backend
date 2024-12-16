@@ -3,8 +3,9 @@ import axios from 'axios';
 
 
 
-//Search destinations Auto-Complete
 const client = new Client({});
+//Search destinations Auto-Complete
+
 export const autocompleteSearch = async (req, res) => {
     const { input } = req.query;
   
@@ -127,7 +128,7 @@ export const fetchWeather = async (req, res) => {
 
 export const getRoute = async (req, res) => {
   const requestBody = req.body;
-  console.log(requestBody);
+  // console.log(requestBody);
   try {
     const response = await axios.post(
       `https://routes.googleapis.com/directions/v2:computeRoutes`,
@@ -161,3 +162,29 @@ export const getMapData = async (req, res) => {
     res.status(500).send('Failed to load Google Maps API script');
   }
 };
+
+export const geocodeAddress = async (req, res) => {
+  const { markers } = req.body;
+  
+  try {
+    const geocodedLocations = await Promise.all(
+      markers.map(async (location) => {
+        const response = await client.geocode({
+          params: {
+            address: location.address,
+            key: process.env.GOOGLE_MAPS_API_KEY
+          }
+        });
+        
+        return {
+          position: response.data.results[0].geometry.location,
+          title: location.title
+        };
+      })
+    );
+    
+    res.json(geocodedLocations);
+  } catch (error) {
+    res.status(500).json({ error: 'Geocoding failed' });
+  }
+}
