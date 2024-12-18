@@ -12,13 +12,17 @@ const PORT = process.env.PORT || 3000;
 connectDB();
 
 app.use(cors({
-  origin: [process.env.FRONTEND_URL, 'http://localhost:5173'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], 
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,
-  preflightContinue: true,
-  optionsSuccessStatus: 200
-}));
+    origin: [
+      process.env.FRONTEND_URL, 
+      'http://localhost:5173',
+      'https://wanderly-rust.vercel.app'
+    ],
+    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS', 'PUT'], 
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+    exposedHeaders: ['Authorization'],
+    credentials: true,
+    maxAge: 86400
+  }));
 
 app.options('*', cors());
 app.use(express.json());
