@@ -1,5 +1,5 @@
 import express from 'express';
-import {login, signup, logoutAll, logoutOne, saveTrip, startTrip, editTrip, endTrip, getTrips, getTrip, updateProfile, startExistingTrip, getUserStatus} from '../controllers/User.js'
+import {login, signup, logoutAll, logoutOne, saveTrip, startTrip, editTrip, endTrip, getTrips, getTrip, updateProfile, startExistingTrip, getUserStatus, deleteTrip} from '../controllers/User.js'
 import auth from '../middleware/auth.js'
 
 const router = express.Router();
@@ -20,7 +20,7 @@ router.get('/getTrip/:tripId', auth, getTrip);
 router.post('/startExistingTrip/:tripId', auth, startExistingTrip);
 router.patch('/editTrip/:tripId', auth, editTrip);
 router.post('/endTrip/:tripId', auth, endTrip);
-
+router.delete('/deleteTrip/:tripId', auth, deleteTrip);
 
 
 router.patch('/updateProfile', auth, updateProfile);

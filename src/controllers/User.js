@@ -117,6 +117,15 @@ export const updateProfile = async (req, res) => {
 export const saveTrip = async (req, res) => {
     try {
     const { tripLocation, estimatedBudget, tripBudget, tripStartDate, tripAttractions } = req.body;
+    const tempTrip = await Trip.findOne({tripLocation, tripStartDate});
+    if(tempTrip){
+        tempTrip.tripAttractions = tripAttractions;
+        tempTrip.estimatedBudget = estimatedBudget;
+        tempTrip.tripBudget = tripBudget;
+        tempTrip.tripAttractions = tripAttractions;
+        await tempTrip.save();
+        return res.status(200).json(tempTrip);
+    }
     const userId = req.user._id;
     const newTrip = new Trip({
         userId,
@@ -277,5 +286,24 @@ export const endTrip = async (req, res) => {
     } catch (error) {
     console.log(error);
     res.status(500).json({ message: 'Error ending trip', error });
+    }
+}
+
+export const deleteTrip = async (req, res) => {
+    try {
+        const { tripId } = req.params;
+        const userId = req.user._id;
+        const trip = await Trip.findById(tripId);
+        if (!trip) {
+            return res.status(404).json({ message: 'Trip not found' });
+        }
+        if (trip.userId.toString() !== userId.toString()) {
+            return res.status(403).json({ message: 'Unauthorized' });
+        }
+        await Trip.findByIdAndDelete(tripId);
+        res.status(200).json({ message: 'Trip deleted successfully' });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: 'Error deleting trip', error });
     }
 }
